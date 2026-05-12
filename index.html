@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>운동 타이머</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
+  --border: rgba(255,255,255,0.1); --text: #f0f0f0; --muted: #888;
+  --accent: #4f9eff; --success: #3ecf8e; --rest: #f5a623; --danger: #ff5c5c;
+}
+body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic Neo','Noto Sans KR',sans-serif; min-height: 100vh; padding: 1rem; -webkit-tap-highlight-color: transparent; }
+.wrap { max-width: 480px; margin: 0 auto; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 1.2rem; background: var(--surface); border-radius: 10px; padding: 4px; }
+.tab { flex: 1; padding: 8px; border-radius: 8px; border: none; background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.tab.active { background: var(--surface2); color: var(--text); font-weight: 600; }
+
+.rest-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border-radius: 12px; margin-bottom: 0.7rem; border: 1px solid var(--border); }
+.rest-bar label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.rest-bar input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; background: var(--surface2); border-radius: 2px; outline: none; }
+.rest-bar input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+.rest-bar span { font-size: 13px; font-weight: 600; color: var(--accent); min-width: 36px; text-align: right; }
+
+.sets-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border-radius: 12px; margin-bottom: 1rem; border: 1px solid var(--border); }
+.sets-bar label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.sets-btns { display: flex; gap: 6px; }
+.sets-btn { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.sets-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+.ex-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.8rem; }
+.ex-name { font-size: 22px; font-weight: 700; }
+.ex-counter { font-size: 13px; color: var(--muted); }
+
+.sets-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+.set-dot { flex: 1; height: 6px; border-radius: 3px; background: var(--surface2); transition: background 0.2s; }
+.set-dot.done { background: var(--success); }
+.set-dot.active { background: var(--accent); }
+
+.timer-card {
+  background: var(--surface); border-radius: 16px; border: 1px solid var(--border);
+  padding: 2.5rem 1rem; text-align: center; margin-bottom: 1rem;
+  min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; user-select: none; transition: background 0.15s;
+}
+.timer-card:active { background: var(--surface2); }
+.timer-card.completed-card { border-color: var(--success); background: rgba(62,207,142,0.07); cursor: default; }
+.timer-card.completed-card:active { background: rgba(62,207,142,0.07); }
+.timer-label { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+.timer-display { font-size: 64px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.timer-display.resting { color: var(--rest); }
+.timer-display.completed { font-size: 26px; color: var(--success); }
+.timer-hint { font-size: 12px; color: var(--muted); }
+.rest-progress { width: 100%; height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+.rest-progress-bar { height: 100%; background: var(--rest); border-radius: 2px; }
+
+.ex-list { display: flex; flex-direction: column; gap: 6px; }
+.ex-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: border-color 0.15s; }
+.ex-item.current { border-color: var(--accent); }
+.ex-item.completed { border-color: var(--success); background: rgba(62,207,142,0.07); }
+.ex-num { font-size: 12px; color: var(--muted); width: 18px; }
+.ex-name-item { font-size: 14px; flex: 1; }
+.ex-prog { font-size: 12px; color: var(--muted); }
+.ex-item.completed .ex-prog { color: var(--success); }
+
+.copy-btn {
+  width: 100%; margin-top: 12px; padding: 13px;
+  border-radius: 10px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--muted);
+  font-size: 13px; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.copy-btn:active { background: var(--surface2); }
+.copy-btn.copied { border-color: var(--success); color: var(--success); }
+
+.section-title { font-size: 12px; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.06em; text-transform: uppercase; }
+.template-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
+.tpl-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; }
+.tpl-item:active { background: var(--surface2); }
+.tpl-name { font-size: 14px; font-weight: 600; }
+.tpl-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.tpl-arrow { color: var(--muted); font-size: 20px; line-height: 1; }
+
+.sound-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+.sound-bar label { font-size: 13px; color: var(--muted); flex: 1; }
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track { position: absolute; inset: 0; background: var(--surface2); border-radius: 12px; cursor: pointer; transition: background 0.2s; border: 1px solid var(--border); }
+.toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
+.toggle-thumb { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: transform 0.2s; pointer-events: none; }
+.toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+.edit-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+.edit-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); }
+.edit-num { font-size: 12px; color: var(--muted); width: 18px; flex-shrink: 0; }
+.edit-item input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 14px; outline: none; font-family: inherit; min-width: 0; }
+.edit-item input::placeholder { color: var(--muted); }
+.del-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255,92,92,0.3); background: transparent; color: var(--danger); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
+.add-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1px dashed var(--border); background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; margin-bottom: 1.5rem; }
+.add-btn:active { background: var(--surface); }
+.apply-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+.apply-btn:active { opacity: 0.85; }
+
+.done-view { text-align: center; padding: 2rem 1rem; }
+.done-big { font-size: 32px; font-weight: 700; color: var(--success); margin-bottom: 8px; }
+.done-sub { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
+.done-copy-btn {
+  width: 100%; padding: 14px; border-radius: 12px;
+  border: 1px solid var(--success); background: rgba(62,207,142,0.1);
+  color: var(--success); font-size: 15px; font-weight: 600; cursor: pointer;
+  margin-bottom: 0.7rem;
+}
+.done-copy-btn.copied { background: rgba(62,207,142,0.25); }
+.reset-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 15px; cursor: pointer; }
+
+.wake-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-bottom: 0.7rem; }
+.wake-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+.wake-dot.active { background: var(--success); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('timer')">타이머</button>
+    <button class="tab" onclick="switchTab('settings')">설정</button>
+  </div>
+
+  <div id="timerTab">
+    <div class="wake-indicator">
+      <div class="wake-dot" id="wakeDot"></div>
+      <span id="wakeLabel">화면 유지 비활성</span>
+    </div>
+    <div class="rest-bar">
+      <label>휴식 시간</label>
+      <input type="range" id="restSlider" min="30" max="180" step="10" value="60">
+      <span id="restVal">60초</span>
+    </div>
+    <div id="mainView">
+      <div class="ex-header">
+        <div class="ex-name" id="exName"></div>
+        <div class="ex-counter" id="exCounter"></div>
+      </div>
+      <div class="sets-row" id="setsRow"></div>
+      <div class="timer-card" id="timerCard" onclick="handleCardTap()">
+        <div class="timer-label" id="timerLabel"></div>
+        <div class="timer-display" id="timerDisplay"></div>
+        <div class="timer-hint" id="timerHint"></div>
+        <div class="rest-progress" id="progressWrap" style="display:none;">
+          <div class="rest-progress-bar" id="progressBar" style="width:100%;"></div>
+        </div>
+      </div>
+      <div class="ex-list" id="exList"></div>
+      <button class="copy-btn" id="midCopyBtn" onclick="copyRecord()">
+        <span id="midCopyText">📋 현재까지 기록 복사</span>
+      </button>
+    </div>
+    <div class="done-view" id="doneView" style="display:none;">
+      <div class="done-big">운동 완료</div>
+      <div class="done-sub" id="doneSub"></div>
+      <button class="done-copy-btn" id="doneCopyBtn" onclick="copyRecord(true)">📋 기록 복사 (Notion용)</button>
+      <button class="reset-btn" onclick="resetAll()">다시 시작</button>
+    </div>
+  </div>
+
+  <div id="settingsTab" style="display:none;">
+    <div class="sets-bar">
+      <label>세트 수</label>
+      <div class="sets-btns">
+        <button class="sets-btn active" data-n="3" onclick="pickSets(3)">3</button>
+        <button class="sets-btn" data-n="4" onclick="pickSets(4)">4</button>
+        <button class="sets-btn" data-n="5" onclick="pickSets(5)">5</button>
+      </div>
+    </div>
+    <div class="section-title">알림</div>
+    <div class="sound-bar">
+      <label>소리</label>
+      <label class="toggle">
+        <input type="checkbox" id="soundToggle" checked>
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+    <div class="section-title">템플릿</div>
+    <div class="template-list" id="tplList"></div>
+    <div class="section-title">종목 편집 <span style="font-weight:400;">(최대 10개)</span></div>
+    <div class="edit-list" id="editList"></div>
+    <button class="add-btn" id="addBtn" onclick="addExercise()">+ 종목 추가</button>
+    <button class="apply-btn" onclick="applySettings()">적용하고 운동 시작</button>
+  </div>
+</div>
+
+<script>
+const TEMPLATES = [
+  { name: "전신 덤벨", desc: "7종목 · 하체→가슴→등→어깨→팔", exercises: ["덤벨 스쿼트","덤벨 런지","덤벨 데드리프트","플로어 프레스","원암 덤벨 로우","숄더 프레스","레터럴 레이즈"] },
+  { name: "상체 덤벨", desc: "6종목 · 가슴→등→어깨→팔", exercises: ["플로어 프레스","플로어 프레스 (모아서)","원암 덤벨 로우","숄더 프레스","레터럴 레이즈","이두 컬"] },
+  { name: "하체 덤벨", desc: "5종목 · 대퇴→둔근→햄스트링", exercises: ["덤벨 스쿼트","덤벨 런지","덤벨 데드리프트","덤벨 힙 쓰러스트","덤벨 카프 레이즈"] },
+  { name: "어깨·팔", desc: "5종목 · 어깨→이두→삼두", exercises: ["숄더 프레스","레터럴 레이즈","프론트 레이즈","이두 컬","해머 컬"] },
+  { name: "맨몸 전신", desc: "6종목 · 도구 없이", exercises: ["푸시업","와이드 푸시업","딥스","스쿼트","런지","플랭크"] },
+];
+
+let exercises = [...TEMPLATES[0].exercises];
+let templateName = TEMPLATES[0].name;
+let SETS = 3;
+let exIdx = 0;
+let setsArr = [];
+let resting = false;
+let restRemaining = 0;
+let restDuration = 60;
+let restTimer = null;
+let startTime = Date.now();
+let editExercises = [];
+let audioCtx = null;
+let soundEnabled = true;
+let wakeLock = null;
+
+function initSets() { setsArr = Array(exercises.length).fill(0); }
+initSets();
+
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    updateWakeIndicator(true);
+    wakeLock.addEventListener('release', () => updateWakeIndicator(false));
+  } catch(e) { updateWakeIndicator(false); }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock) { await wakeLock.release(); wakeLock = null; }
+  updateWakeIndicator(false);
+}
+
+function updateWakeIndicator(active) {
+  document.getElementById('wakeDot').className = 'wake-dot' + (active ? ' active' : '');
+  document.getElementById('wakeLabel').textContent = active ? '화면 유지 중' : '화면 유지 비활성';
+}
+
+document.addEventListener('visibilitychange', async () => {
+  if (wakeLock !== null && document.visibilityState === 'visible') await requestWakeLock();
+});
+
+requestWakeLock();
+
+function buildRecord() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const dateStr = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
+  const elapsed = Math.round((Date.now() - startTime) / 60000);
+  const completed = exercises.filter((_, i) => setsArr[i] >= SETS);
+  const partial = exercises.map((ex, i) => ({ name: ex, sets: setsArr[i] })).filter(e => e.sets > 0);
+  return JSON.stringify({
+    date: dateStr,
+    template: templateName,
+    total_sets: SETS,
+    exercises: partial,
+    completed_count: completed.length,
+    total_count: exercises.length,
+    duration_min: elapsed
+  });
+}
+
+function copyRecord(isDone) {
+  const json = buildRecord();
+  navigator.clipboard.writeText(json).then(() => {
+    if (isDone) {
+      const btn = document.getElementById('doneCopyBtn');
+      btn.textContent = '✓ 복사 완료';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 기록 복사 (Notion용)'; btn.classList.remove('copied'); }, 2000);
+    } else {
+      const btn = document.getElementById('midCopyBtn');
+      const txt = document.getElementById('midCopyText');
+      txt.textContent = '✓ 복사 완료';
+      btn.classList.add('copied');
+      setTimeout(() => { txt.textContent = '📋 현재까지 기록 복사'; btn.classList.remove('copied'); }, 2000);
+    }
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = json; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTones(tones) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    tones.forEach(([freq, start, dur]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq; o.type = 'sine';
+      const t = ctx.currentTime + start;
+      g.gain.setValueAtTime(0.4, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur + 0.1);
+      o.start(t); o.stop(t + dur + 0.15);
+    });
+  } catch(e) {}
+}
+function playSetComplete() { playTones([[440,0,0.08],[660,0.12,0.08]]); }
+function playExComplete() { playTones([[330,0,0.08],[440,0.1,0.08],[550,0.2,0.08],[660,0.3,0.15]]); }
+function playRestEnd() { playTones([[880,0,0.06],[660,0.1,0.1]]); }
+function vibrateLong() { if (navigator.vibrate) navigator.vibrate(500); }
+
+document.getElementById('restSlider').addEventListener('input', function() {
+  restDuration = parseInt(this.value);
+  document.getElementById('restVal').textContent = restDuration + '초';
+});
+document.getElementById('soundToggle').addEventListener('change', function() {
+  soundEnabled = this.checked;
+});
+
+function switchTab(t) {
+  document.getElementById('timerTab').style.display = t === 'timer' ? 'block' : 'none';
+  document.getElementById('settingsTab').style.display = t === 'settings' ? 'block' : 'none';
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', (i===0&&t==='timer')||(i===1&&t==='settings')));
+  if (t === 'settings') renderSettings();
+}
+
+function renderAll() {
+  if (setsArr.every(s => s >= SETS)) {
+    document.getElementById('mainView').style.display = 'none';
+    document.getElementById('doneView').style.display = 'block';
+    const elapsed = Math.round((Date.now() - startTime) / 60000);
+    document.getElementById('doneSub').textContent = exercises.length + '종목 ' + (exercises.length * SETS) + '세트 · ' + elapsed + '분';
+    return;
+  }
+  document.getElementById('exName').textContent = exercises[exIdx];
+  document.getElementById('exCounter').textContent = (exIdx+1) + ' / ' + exercises.length;
+  renderDots(); renderTimer(); renderList();
+}
+
+function renderDots() {
+  const row = document.getElementById('setsRow');
+  row.innerHTML = '';
+  const done = setsArr[exIdx];
+  for (let i = 0; i < SETS; i++) {
+    const d = document.createElement('div');
+    d.className = 'set-dot' + (i < done ? ' done' : (i === done ? ' active' : ''));
+    row.appendChild(d);
+  }
+}
+
+function renderTimer() {
+  const card = document.getElementById('timerCard');
+  const label = document.getElementById('timerLabel');
+  const display = document.getElementById('timerDisplay');
+  const hint = document.getElementById('timerHint');
+  const prog = document.getElementById('progressWrap');
+  const done = setsArr[exIdx];
+  if (done >= SETS) {
+    card.className = 'timer-card completed-card';
+    label.textContent = '종목 완료';
+    display.textContent = '다음 종목으로 →';
+    display.className = 'timer-display completed';
+    hint.textContent = '아래에서 다음 종목 선택';
+    prog.style.display = 'none';
+  } else if (resting) {
+    card.className = 'timer-card';
+    label.textContent = '휴식 중';
+    display.textContent = restRemaining + '초';
+    display.className = 'timer-display resting';
+    hint.textContent = '탭하면 건너뜀';
+    prog.style.display = 'block';
+  } else {
+    card.className = 'timer-card';
+    label.textContent = done === 0 ? '탭해서 세트 완료' : '준비됐으면 탭';
+    display.textContent = done + ' / ' + SETS;
+    display.className = 'timer-display';
+    hint.textContent = SETS + '세트 중 ' + (SETS - done) + '세트 남음';
+    prog.style.display = 'none';
+  }
+}
+
+function renderList() {
+  const list = document.getElementById('exList');
+  list.innerHTML = '';
+  exercises.forEach((ex, i) => {
+    const isDone = setsArr[i] >= SETS;
+    const item = document.createElement('div');
+    item.className = 'ex-item' + (i === exIdx ? ' current' : '') + (isDone ? ' completed' : '');
+    item.innerHTML = '<span class="ex-num">' + (i+1) + '</span><span class="ex-name-item">' + ex + '</span><span class="ex-prog">' + (isDone ? '✓' : setsArr[i] + '/' + SETS) + '</span>';
+    item.onclick = () => { exIdx = i; renderAll(); };
+    list.appendChild(item);
+  });
+}
+
+function handleCardTap() {
+  if (setsArr[exIdx] >= SETS) return;
+  if (resting) { skipRest(); return; }
+  completeSet();
+}
+
+function completeSet() {
+  setsArr[exIdx]++;
+  if (setsArr[exIdx] < SETS) {
+    playSetComplete(); vibrateLong(); startRest();
+  } else {
+    playExComplete(); vibrateLong(); renderAll();
+    const next = exercises.findIndex((_, i) => i > exIdx && setsArr[i] < SETS);
+    if (next !== -1) setTimeout(() => { exIdx = next; renderAll(); }, 1400);
+    else setTimeout(() => checkDone(), 400);
+  }
+}
+
+function startRest() {
+  resting = true; restRemaining = restDuration; renderAll();
+  const bar = document.getElementById('progressBar');
+  bar.style.transition = 'none'; bar.style.width = '100%';
+  setTimeout(() => { bar.style.transition = 'width ' + restDuration + 's linear'; bar.style.width = '0%'; }, 60);
+  restTimer = setInterval(() => {
+    restRemaining--;
+    if (restRemaining <= 0) {
+      clearInterval(restTimer); resting = false; playRestEnd(); vibrateLong(); renderAll();
+    } else { document.getElementById('timerDisplay').textContent = restRemaining + '초'; }
+  }, 1000);
+}
+
+function skipRest() {
+  clearInterval(restTimer); resting = false;
+  document.getElementById('progressBar').style.transition = 'none'; renderAll();
+}
+
+function checkDone() {
+  if (setsArr.every(s => s >= SETS)) { renderAll(); playExComplete(); vibrateLong(); }
+}
+
+function resetAll() {
+  clearInterval(restTimer); resting = false; exIdx = 0; startTime = Date.now();
+  initSets();
+  document.getElementById('mainView').style.display = 'block';
+  document.getElementById('doneView').style.display = 'none';
+  renderAll();
+}
+
+function renderSettings() {
+  editExercises = [...exercises];
+  renderTplList(); renderEditList();
+  document.querySelectorAll('.sets-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === SETS));
+  document.getElementById('soundToggle').checked = soundEnabled;
+}
+
+function renderTplList() {
+  const list = document.getElementById('tplList');
+  list.innerHTML = '';
+  TEMPLATES.forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'tpl-item';
+    item.innerHTML = '<div><div class="tpl-name">' + t.name + '</div><div class="tpl-desc">' + t.desc + '</div></div><span class="tpl-arrow">›</span>';
+    item.onclick = () => { editExercises = [...t.exercises]; templateName = t.name; renderEditList(); };
+    list.appendChild(item);
+  });
+}
+
+function renderEditList() {
+  const list = document.getElementById('editList');
+  list.innerHTML = '';
+  editExercises.forEach((ex, i) => {
+    const item = document.createElement('div');
+    item.className = 'edit-item';
+    const num = document.createElement('span'); num.className = 'edit-num'; num.textContent = i+1;
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.value = ex; inp.placeholder = '종목명';
+    const idx = i;
+    inp.oninput = () => { editExercises[idx] = inp.value; };
+    const del = document.createElement('button');
+    del.className = 'del-btn'; del.textContent = '×';
+    del.onclick = () => { editExercises.splice(idx, 1); renderEditList(); };
+    item.appendChild(num); item.appendChild(inp); item.appendChild(del);
+    list.appendChild(item);
+  });
+  document.getElementById('addBtn').style.display = editExercises.length >= 10 ? 'none' : 'block';
+}
+
+function addExercise() {
+  if (editExercises.length >= 10) return;
+  editExercises.push(''); renderEditList();
+  const inputs = document.querySelectorAll('.edit-item input');
+  if (inputs.length) inputs[inputs.length-1].focus();
+}
+
+function pickSets(n) {
+  SETS = n;
+  document.querySelectorAll('.sets-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === n));
+}
+
+function applySettings() {
+  const filtered = editExercises.filter(e => e.trim() !== '');
+  if (!filtered.length) { alert('종목을 1개 이상 입력해주세요.'); return; }
+  exercises = filtered;
+  clearInterval(restTimer); resting = false; exIdx = 0; startTime = Date.now();
+  initSets(); switchTab('timer'); renderAll();
+}
+
+renderAll();
+</script>
+</body>
+</html>
