@@ -53,7 +53,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
 .current-ex-card.completed-card:active { background: linear-gradient(135deg, rgba(62,207,142,0.15) 0%, rgba(56,189,212,0.15) 100%); }
 .current-ex-card.completed-card .current-ex-top { background: transparent; }
 .ex-name { font-size: 22px; font-weight: 700; }
-.ex-counter { font-size: 13px; color: var(--muted); }
+.ex-counter { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.ex-counter-elapsed { font-size: 12px; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.list-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; margin-top: 0.8rem; }
+.list-title-row .timer-section-title { margin: 0; }
+.list-progress { font-size: 13px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 .timer-main {
   padding: 1.2rem 1rem 1.4rem;
@@ -63,8 +68,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
 }
 .rest-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: var(--surface2); border-radius: 0 0 16px 16px; overflow: hidden; }
 .rest-progress-bar { height: 100%; background: linear-gradient(90deg, var(--rest), #ff8c42); border-radius: 0 0 16px 16px; box-shadow: 0 0 8px rgba(245,166,35,0.6); }
-.timer-label { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
-.timer-display { font-size: 56px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.timer-label { font-size: 17px; color: var(--text); font-weight: 500; letter-spacing: 0.01em; }
+.timer-display { font-size: 38px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; color: var(--muted); }
 .timer-display.resting { color: var(--rest); }
 .timer-display.completed { font-size: 26px; background: linear-gradient(90deg, var(--success), #38bdd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
@@ -74,12 +79,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
 .set-dot.active { background: var(--accent); }
 
 .ex-list { display: flex; flex-direction: column; gap: 6px; }
-.ex-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: border-color 0.15s; }
+.ex-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid transparent; background: var(--surface2); cursor: pointer; transition: border-color 0.15s, opacity 0.2s; }
 .ex-item.current { border-color: var(--accent); }
-.ex-item.completed { border-color: var(--success); background: rgba(62,207,142,0.07); }
+.ex-item.completed { opacity: 0.45; }
 .ex-num { font-size: 12px; color: var(--muted); width: 18px; }
 .ex-name-item { font-size: 14px; flex: 1; }
-.ex-prog { font-size: 12px; color: var(--muted); }
+.ex-prog { font-size: 12px; color: var(--text); }
 .ex-item.completed .ex-prog { color: var(--success); }
 .yt-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; cursor: pointer; opacity: 0.45; transition: opacity 0.15s; flex-shrink: 0; padding: 0; }
 .yt-btn:active { opacity: 1; }
@@ -94,6 +99,44 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
 }
 .copy-btn:active { background: var(--surface2); }
 .copy-btn.copied { border-color: var(--success); color: var(--success); }
+
+.edit-sheet-btn { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; transition: all 0.15s; }
+.edit-sheet-btn:active { background: var(--surface2); }
+
+.sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.sheet-overlay.open { opacity: 1; pointer-events: auto; }
+.sheet-panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 101; background: var(--surface); border-radius: 20px 20px 0 0; border-top: 1px solid var(--border); max-height: 88vh; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); }
+.sheet-panel.open { transform: translateY(0); }
+.sheet-handle-row { display: flex; justify-content: center; padding: 10px 0 4px; flex-shrink: 0; }
+.sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
+.sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 16px 12px; flex-shrink: 0; }
+.sheet-title { font-size: 16px; font-weight: 700; }
+.sheet-close { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--surface2); color: var(--muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.sheet-body { overflow-y: auto; padding: 0 16px 24px; flex: 1; }
+.sheet-section-title { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.05em; margin: 4px 0 8px; }
+
+.sheet-tpl-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.sheet-tpl-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; transition: border-color 0.15s; }
+.sheet-tpl-item:active { border-color: var(--accent); }
+.sheet-tpl-item.selected { border-color: var(--accent); background: rgba(79,158,255,0.08); }
+.sheet-tpl-name { font-size: 14px; font-weight: 600; }
+.sheet-tpl-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.sheet-tpl-apply { font-size: 12px; color: var(--accent); font-weight: 600; flex-shrink: 0; padding-left: 8px; }
+
+.sheet-ex-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.sheet-ex-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); }
+.sheet-ex-num { font-size: 12px; color: var(--muted); width: 18px; flex-shrink: 0; }
+.sheet-ex-name { font-size: 14px; flex: 1; }
+.sheet-move-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+.sheet-move-btn { width: 24px; height: 20px; border-radius: 5px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.sheet-move-btn:active { background: var(--surface); }
+.sheet-move-btn:disabled { opacity: 0.25; cursor: default; }
+.sheet-del-btn { width: 28px; height: 28px; border-radius: 7px; border: 1px solid rgba(255,92,92,0.3); background: transparent; color: var(--danger); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
+.sheet-del-btn:active { background: rgba(255,92,92,0.08); }
+.sheet-add-btn { width: 100%; padding: 11px; border-radius: 10px; border: 1px dashed var(--border); background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; margin-bottom: 14px; }
+.sheet-add-btn:active { background: var(--surface); }
+.sheet-apply-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+.sheet-apply-btn:active { opacity: 0.85; }
 
 .theme-bar { display: flex; gap: 8px; margin-bottom: 1rem; }
 .theme-btn { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 14px; cursor: pointer; transition: all 0.15s; }
@@ -130,6 +173,15 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
 .apply-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
 .apply-btn:active { opacity: 0.85; }
 
+.planner-box { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 14px; margin-bottom: 1rem; }
+.planner-textarea { width: 100%; min-height: 90px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 12px; font-family: monospace; padding: 10px; resize: none; outline: none; margin-bottom: 10px; }
+.planner-textarea::placeholder { color: var(--muted); }
+.planner-load-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+.planner-load-btn:active { opacity: 0.85; }
+.planner-msg { font-size: 12px; margin-top: 8px; text-align: center; min-height: 18px; }
+.planner-msg.ok { color: var(--success); }
+.planner-msg.err { color: var(--danger); }
+
 .done-view { text-align: center; padding: 2rem 1rem; }
 .done-big { font-size: 32px; font-weight: 700; color: var(--success); margin-bottom: 8px; }
 .done-sub { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
@@ -145,22 +197,10 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
 .wake-indicator { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 0.7rem; }
 .wake-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
 .wake-dot.active { background: var(--success); }
+.wake-now { margin-left: auto; font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
 
-.recent-section { margin-bottom: 0.9rem; }
-.recent-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; padding-left: 2px; }
-.recent-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.recent-chip {
-  display: flex; align-items: center; gap: 6px;
-  padding: 7px 14px; border-radius: 20px;
-  border: 1px solid var(--border); background: var(--surface2);
-  color: var(--text); font-size: 13px; cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  white-space: nowrap; max-width: 160px;
-}
-.recent-chip:active { border-color: var(--accent); background: rgba(79,158,255,0.1); }
-.recent-chip-icon { font-size: 11px; flex-shrink: 0; }
-.recent-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.recent-chip-sets { font-size: 10px; color: var(--muted); flex-shrink: 0; }
+.session-elapsed { font-size: 14px; color: var(--muted); }
+.session-elapsed span { font-size: 28px; font-weight: 700; color: var(--accent); margin-left: 6px; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -174,18 +214,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
     <div class="wake-indicator">
       <div class="wake-dot" id="wakeDot"></div>
       <span id="wakeLabel">화면 유지 비활성</span>
-      <span id="startDateTimeLabel" style="margin-left:auto;font-size:13px;color:var(--muted);letter-spacing:0.04em;"></span>
-    </div>
-
-    <div class="recent-section" id="recentSection" style="display:none;">
-      <div class="timer-section-title">최근 운동</div>
-      <div class="recent-chips" id="recentChips"></div>
-    </div>
-
-    <div class="timer-section-title" style="margin-top:0.8rem;">휴식 시간</div>
-    <div class="rest-bar">
-      <input type="range" id="restSlider" min="20" max="90" step="5" value="60">
-      <span id="restVal">60초</span>
+      <span class="wake-now" id="wakeNow"></span>
     </div>
 
     <div id="mainView">
@@ -193,7 +222,9 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
       <div class="current-ex-card" id="timerCard" onclick="handleCardTap()">
         <div class="current-ex-top">
           <div class="ex-name" id="exName"></div>
-          <div class="ex-counter" id="exCounter"></div>
+          <div class="ex-counter" id="exCounter">
+            <span class="ex-counter-elapsed" id="exCounterElapsed"></span>
+          </div>
         </div>
         <div class="timer-main">
           <div class="timer-label" id="timerLabel"></div>
@@ -205,7 +236,13 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
       </div>
       <div class="sets-row" id="setsRow"></div>
 
-      <div class="timer-section-title" style="margin-top:0.8rem;">종목 목록</div>
+      <div class="list-title-row">
+        <div class="timer-section-title">종목 목록</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="list-progress" id="listProgress"></span>
+          <button class="edit-sheet-btn" onclick="openSheet()">✏ 편집</button>
+        </div>
+      </div>
       <div class="ex-list" id="exList"></div>
       <button class="copy-btn" id="midCopyBtn" onclick="copyRecord()">
         <span id="midCopyText">📋 현재까지 기록 복사</span>
@@ -237,6 +274,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
         <div class="toggle-thumb"></div>
       </label>
     </div>
+    <div class="section-title">휴식 시간</div>
+    <div class="rest-bar" style="margin-bottom:1.5rem;">
+      <label>휴식</label>
+      <input type="range" id="restSlider" min="20" max="90" step="5" value="60">
+      <span id="restVal">60초</span>
+    </div>
     <div class="section-title">화면 테마</div>
     <div class="theme-bar">
       <button class="theme-btn active" id="themeDark" onclick="setTheme('dark')">🌙 다크</button>
@@ -244,6 +287,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
     </div>
     <div class="section-title">템플릿</div>
     <div class="template-list" id="tplList"></div>
+    <div class="section-title">플래너 불러오기</div>
+    <div class="planner-box">
+      <textarea class="planner-textarea" id="plannerInput" placeholder='Claude가 출력한 JSON을 붙여넣으세요&#10;{"label":"상체 + 코어","exercises":[{"name":"플로어 프레스","sets":3}, ...]}'></textarea>
+      <button class="planner-load-btn" onclick="loadPlanner()">불러오기</button>
+      <div class="planner-msg" id="plannerMsg"></div>
+    </div>
     <div class="section-title">종목 편집 <span style="font-weight:400;font-size:12px;color:var(--muted);">(최대 10개)</span></div>
     <div class="edit-list" id="editList"></div>
     <button class="add-btn" id="addBtn" onclick="addExercise()">+ 종목 추가</button>
@@ -282,6 +331,8 @@ let editExercises = [];
 let audioCtx = null;
 let soundEnabled = true;
 let wakeLock = null;
+let elapsedTimer = null;
+let pendingNext = -1;
 
 function initSets() { setsArr = Array(exercises.length).fill(0); }
 initSets();
@@ -412,10 +463,17 @@ function renderAll() {
     document.getElementById('doneSub').textContent = exercises.length + '종목 ' + (exercises.length * SETS) + '세트 · ' + elapsed + '분';
     return;
   }
-  document.getElementById('exName').textContent = exercises[exIdx];
-  document.getElementById('exCounter').textContent = (exIdx+1) + ' / ' + exercises.length;
+  document.getElementById('exName').textContent = (resting && pendingNext !== -1) ? exercises[pendingNext] : exercises[exIdx];
+  const counterElapsed = document.getElementById('exCounterElapsed');
+  if (counterElapsed) {
+    const elapsed = Math.round((Date.now() - startTime) / 60000);
+    counterElapsed.textContent = '경과 ' + elapsed + '분';
+  }
+  const doneCount = setsArr.filter((s, i) => s >= SETS).length;
+  const prog = document.getElementById('listProgress');
+  if (prog) prog.textContent = doneCount + ' / ' + exercises.length;
   renderDots(); renderTimer(); renderList();
-  renderStartDateTime();
+  updateSessionInfo();
 }
 
 function renderDots() {
@@ -452,18 +510,18 @@ function renderTimer() {
   const display = document.getElementById('timerDisplay');
   const prog = document.getElementById('progressWrap');
   const done = setsArr[exIdx];
-  if (done >= SETS) {
+  if (resting) {
+    card.className = 'current-ex-card';
+    label.textContent = pendingNext !== -1 ? '종목 완료 · 탭하면 스킵' : '탭하면 스킵';
+    display.textContent = restRemaining + '초';
+    display.className = 'timer-display resting';
+    prog.style.display = 'block';
+  } else if (done >= SETS) {
     card.className = 'current-ex-card completed-card';
     label.textContent = '종목 완료';
     display.textContent = '다음 종목으로 →';
     display.className = 'timer-display completed';
     prog.style.display = 'none';
-  } else if (resting) {
-    card.className = 'current-ex-card';
-    label.textContent = '휴식 중';
-    display.textContent = restRemaining + '초';
-    display.className = 'timer-display resting';
-    prog.style.display = 'block';
   } else {
     card.className = 'current-ex-card';
     label.textContent = getCheer(done === 0);
@@ -496,8 +554,8 @@ function renderList() {
 }
 
 function handleCardTap() {
-  if (setsArr[exIdx] >= SETS) return;
   if (resting) { skipRest(); return; }
+  if (setsArr[exIdx] >= SETS) return;
   completeSet();
 }
 
@@ -506,11 +564,31 @@ function completeSet() {
   if (setsArr[exIdx] < SETS) {
     playSetComplete(); vibrateLong(); startRest();
   } else {
-    playExComplete(); vibrateLong(); renderAll();
+    playExComplete(); vibrateLong();
     const next = exercises.findIndex((_, i) => i > exIdx && setsArr[i] < SETS);
-    if (next !== -1) setTimeout(() => { exIdx = next; renderAll(); }, 1400);
-    else setTimeout(() => checkDone(), 400);
+    if (next !== -1) {
+      startRestThenNext(next);
+    } else {
+      renderAll();
+      setTimeout(() => checkDone(), 400);
+    }
   }
+}
+
+function startRestThenNext(nextIdx) {
+  pendingNext = nextIdx;
+  resting = true; restRemaining = restDuration; renderAll();
+  const bar = document.getElementById('progressBar');
+  bar.style.transition = 'none'; bar.style.width = '100%';
+  setTimeout(() => { bar.style.transition = 'width ' + restDuration + 's linear'; bar.style.width = '0%'; }, 60);
+  restTimer = setInterval(() => {
+    restRemaining--;
+    if (restRemaining <= 0) {
+      clearInterval(restTimer); resting = false;
+      exIdx = pendingNext; pendingNext = -1;
+      playRestEnd(); vibrateLong(); renderAll();
+    } else { document.getElementById('timerDisplay').textContent = restRemaining + '초'; }
+  }, 1000);
 }
 
 function startRest() {
@@ -528,13 +606,13 @@ function startRest() {
 
 function skipRest() {
   clearInterval(restTimer); resting = false;
-  document.getElementById('progressBar').style.transition = 'none'; renderAll();
+  document.getElementById('progressBar').style.transition = 'none';
+  if (pendingNext !== -1) { exIdx = pendingNext; pendingNext = -1; }
+  renderAll();
 }
 
 function checkDone() {
   if (setsArr.every(s => s >= SETS)) {
-    saveRecentWorkout(templateName, exercises, SETS);
-    renderRecentChips();
     renderAll(); playExComplete(); vibrateLong();
   }
 }
@@ -548,6 +626,7 @@ function resetAll() {
   initSets();
   document.getElementById('mainView').style.display = 'block';
   document.getElementById('doneView').style.display = 'none';
+  startElapsedTimer();
   renderAll();
 }
 
@@ -613,8 +692,7 @@ function applySettings() {
   const pad = n => String(n).padStart(2,'0');
   startDateTime = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate())
     + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-  saveRecentWorkout(templateName, exercises, SETS);
-  initSets(); switchTab('timer'); renderAll();
+  initSets(); startElapsedTimer(); switchTab('timer'); renderAll();
 }
 
 // ── 테마 ──────────────────────────────────────────────
@@ -628,58 +706,30 @@ function setTheme(t) {
 }
 setTheme(currentTheme);
 
-// ── 운동 시작 시각 표시 ──────────────────────────────
-function renderStartDateTime() {
-  const el = document.getElementById('startDateTimeLabel');
-  if (el) el.textContent = startDateTime ? '시작: ' + startDateTime : '';
+// ── 세션 정보 (경과 시간 + 현재 시각) ───────────────
+function updateSessionInfo() {
+  const nowEl = document.getElementById('wakeNow');
+  if (nowEl) {
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const days = ['일','월','화','수','목','금','토'];
+    const mm = pad(now.getMonth() + 1);
+    const dd = pad(now.getDate());
+    const day = days[now.getDay()];
+    const hh = pad(now.getHours());
+    const min = pad(now.getMinutes());
+    nowEl.textContent = mm + '/' + dd + '(' + day + ') ' + hh + ':' + min;
+  }
 }
 
-// ── 최근 운동 목록 (localStorage, 최대 3개) ──────────
-function saveRecentWorkout(name, exList, sets) {
-  try {
-    let recent = JSON.parse(localStorage.getItem('recentWorkouts') || '[]');
-    const entry = { name, exercises: [...exList], sets, ts: Date.now() };
-    recent = recent.filter(r => r.name !== name);
-    recent.unshift(entry);
-    if (recent.length > 3) recent = recent.slice(0, 3);
-    localStorage.setItem('recentWorkouts', JSON.stringify(recent));
-  } catch(e) {}
+function startElapsedTimer() {
+  if (elapsedTimer) clearInterval(elapsedTimer);
+  updateSessionInfo();
+  elapsedTimer = setInterval(updateSessionInfo, 60000);
 }
 
-function loadRecentWorkouts() {
-  try { return JSON.parse(localStorage.getItem('recentWorkouts') || '[]'); } catch(e) { return []; }
-}
-
-function renderRecentChips() {
-  const recent = loadRecentWorkouts();
-  const section = document.getElementById('recentSection');
-  const chips = document.getElementById('recentChips');
-  if (!recent.length) { section.style.display = 'none'; return; }
-  section.style.display = 'block';
-  chips.innerHTML = '';
-  recent.forEach(r => {
-    const chip = document.createElement('button');
-    chip.className = 'recent-chip';
-    chip.title = r.exercises.join(', ');
-    chip.innerHTML = '<span class="recent-chip-icon">▸</span>'
-      + '<span class="recent-chip-name">' + r.name + '</span>'
-      + '<span class="recent-chip-sets">' + r.sets + '세트</span>';
-    chip.onclick = () => {
-      exercises = [...r.exercises];
-      templateName = r.name;
-      SETS = r.sets;
-      clearInterval(restTimer); resting = false; exIdx = 0; startTime = Date.now();
-      const now = new Date();
-      const pad = n => String(n).padStart(2,'0');
-      startDateTime = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate())
-        + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-      initSets();
-      document.getElementById('mainView').style.display = 'block';
-      document.getElementById('doneView').style.display = 'none';
-      renderAll();
-    };
-    chips.appendChild(chip);
-  });
+function stopElapsedTimer() {
+  if (elapsedTimer) { clearInterval(elapsedTimer); elapsedTimer = null; }
 }
 
 // ── Enter키로 다음 세트 진행 ──────────────────────────
@@ -690,6 +740,29 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+// ── 플래너 JSON 불러오기 ─────────────────────────────
+function loadPlanner() {
+  const raw = document.getElementById('plannerInput').value.trim();
+  const msg = document.getElementById('plannerMsg');
+  msg.textContent = '';
+  msg.className = 'planner-msg';
+  if (!raw) { msg.textContent = 'JSON을 붙여넣어 주세요.'; msg.className = 'planner-msg err'; return; }
+  let parsed;
+  try { parsed = JSON.parse(raw); } catch(e) { msg.textContent = '올바른 JSON 형식이 아닙니다.'; msg.className = 'planner-msg err'; return; }
+  if (!parsed.exercises || !Array.isArray(parsed.exercises) || !parsed.exercises.length) {
+    msg.textContent = 'exercises 항목이 없거나 비어 있습니다.'; msg.className = 'planner-msg err'; return;
+  }
+  const names = parsed.exercises.map(e => (e.name || '').trim()).filter(n => n !== '');
+  if (!names.length) { msg.textContent = '유효한 종목명이 없습니다.'; msg.className = 'planner-msg err'; return; }
+  const capped = names.slice(0, 10);
+  editExercises = capped;
+  templateName = parsed.label || parsed.date || '플래너';
+  renderEditList();
+  document.getElementById('plannerInput').value = '';
+  msg.textContent = '✓ ' + capped.length + '개 종목 불러오기 완료. 아래에서 확인 후 적용하세요.';
+  msg.className = 'planner-msg ok';
+}
+
 // ── 설정 > 종목 목록 초기화 ──────────────────────────
 function clearExercises() {
   if (!confirm('종목 목록을 모두 초기화할까요?\n(템플릿은 유지됩니다)')) return;
@@ -698,7 +771,109 @@ function clearExercises() {
 }
 
 renderAll();
-if (!loadRecentWorkouts().length) saveRecentWorkout(templateName, exercises, SETS);
-renderRecentChips();</script>
+startElapsedTimer();</script>
+
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+<div class="sheet-panel" id="sheetPanel">
+  <div class="sheet-handle-row"><div class="sheet-handle"></div></div>
+  <div class="sheet-header">
+    <div class="sheet-title">종목 편집</div>
+    <button class="sheet-close" onclick="closeSheet()">×</button>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-section-title">템플릿</div>
+    <div class="sheet-tpl-list" id="sheetTplList"></div>
+    <div class="sheet-section-title">현재 종목 <span style="font-weight:400;font-size:12px;color:var(--muted);">(최대 10개)</span></div>
+    <div class="sheet-ex-list" id="sheetExList"></div>
+    <button class="sheet-add-btn" id="sheetAddBtn" onclick="sheetAddEx()">+ 종목 추가</button>
+    <button class="sheet-apply-btn" onclick="sheetApply()">적용</button>
+  </div>
+</div>
+
+<script>
+let sheetExercises = [];
+
+function openSheet() {
+  sheetExercises = [...exercises];
+  renderSheetTplList();
+  renderSheetExList();
+  document.getElementById('sheetOverlay').classList.add('open');
+  document.getElementById('sheetPanel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSheet() {
+  document.getElementById('sheetOverlay').classList.remove('open');
+  document.getElementById('sheetPanel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderSheetTplList() {
+  const list = document.getElementById('sheetTplList');
+  list.innerHTML = '';
+  TEMPLATES.forEach(t => {
+    const item = document.createElement('div');
+    const isCurrent = t.name === templateName;
+    item.className = 'sheet-tpl-item' + (isCurrent ? ' selected' : '');
+    item.innerHTML = '<div><div class="sheet-tpl-name">' + t.name + '</div><div class="sheet-tpl-desc">' + t.desc + '</div></div>'
+      + '<span class="sheet-tpl-apply">' + (isCurrent ? '현재' : '적용') + '</span>';
+    item.onclick = () => {
+      if (isCurrent) return;
+      if (!confirm(t.name + ' 템플릿을 적용할까요?\n현재 진행 중인 운동이 초기화됩니다.')) return;
+      templateName = t.name;
+      exercises = [...t.exercises];
+      clearInterval(restTimer); resting = false; exIdx = 0; pendingNext = -1; startTime = Date.now();
+      const now = new Date(); const pad = n => String(n).padStart(2,'0');
+      startDateTime = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+      initSets(); startElapsedTimer();
+      closeSheet(); renderAll();
+    };
+    list.appendChild(item);
+  });
+}
+
+function renderSheetExList() {
+  const list = document.getElementById('sheetExList');
+  list.innerHTML = '';
+  sheetExercises.forEach((ex, i) => {
+    const item = document.createElement('div');
+    item.className = 'sheet-ex-item';
+    const num = document.createElement('span'); num.className = 'sheet-ex-num'; num.textContent = i + 1;
+    const name = document.createElement('span'); name.className = 'sheet-ex-name'; name.textContent = ex;
+    const moves = document.createElement('div'); moves.className = 'sheet-move-btns';
+    const up = document.createElement('button'); up.className = 'sheet-move-btn'; up.textContent = '▲';
+    up.disabled = i === 0;
+    up.onclick = () => { [sheetExercises[i-1], sheetExercises[i]] = [sheetExercises[i], sheetExercises[i-1]]; renderSheetExList(); };
+    const dn = document.createElement('button'); dn.className = 'sheet-move-btn'; dn.textContent = '▼';
+    dn.disabled = i === sheetExercises.length - 1;
+    dn.onclick = () => { [sheetExercises[i], sheetExercises[i+1]] = [sheetExercises[i+1], sheetExercises[i]]; renderSheetExList(); };
+    moves.appendChild(up); moves.appendChild(dn);
+    const del = document.createElement('button'); del.className = 'sheet-del-btn'; del.textContent = '×';
+    del.onclick = () => { sheetExercises.splice(i, 1); renderSheetExList(); };
+    item.appendChild(num); item.appendChild(name); item.appendChild(moves); item.appendChild(del);
+    list.appendChild(item);
+  });
+  document.getElementById('sheetAddBtn').style.display = sheetExercises.length >= 10 ? 'none' : 'block';
+}
+
+function sheetAddEx() {
+  if (sheetExercises.length >= 10) return;
+  const name = prompt('추가할 종목명을 입력하세요');
+  if (!name || !name.trim()) return;
+  sheetExercises.push(name.trim());
+  renderSheetExList();
+}
+
+function sheetApply() {
+  const filtered = sheetExercises.filter(e => e.trim() !== '');
+  if (!filtered.length) { alert('종목을 1개 이상 입력해주세요.'); return; }
+  exercises = filtered;
+  if (exIdx >= exercises.length) exIdx = 0;
+  const newSets = Array(exercises.length).fill(0);
+  setsArr.forEach((s, i) => { if (i < newSets.length) newSets[i] = s; });
+  setsArr = newSets;
+  closeSheet(); renderAll();
+}
+</script>
 </body>
 </html>
