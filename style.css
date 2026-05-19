@@ -169,7 +169,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   font-family: inherit; flex-shrink: 0;
 }
-.routine-start-btn { padding: 0 12px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.routine-start-btn { padding: 0 12px; border: 1px solid transparent; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; }
 .routine-edit-btn { width: 32px; border: 1px solid var(--border); background: transparent; color: var(--text); }
 .routine-del-btn { width: 32px; border: 1px solid rgba(255,92,92,0.3); background: transparent; color: var(--danger); font-size: 18px; }
 
