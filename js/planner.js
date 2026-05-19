@@ -127,14 +127,22 @@ const Planner = (() => {
         '<span class="drag-handle" title="드래그하여 순서 변경">⠿</span>' +
         '<span class="editor-ex-num">' + (i+1) + '</span>' +
         '<input class="editor-ex-name" type="text" value="' + ex.name + '" placeholder="종목명">' +
-        '<input class="editor-ex-sets" type="number" min="1" max="10" value="' + ex.sets + '" title="세트 수">' +
-        '<span class="editor-ex-sets-label">세트</span>' +
+        '<div class="sets-stepper">' +
+          '<button class="sets-step-btn" data-dir="-1">▼</button>' +
+          '<span class="sets-step-val">' + ex.sets + '</span>' +
+          '<button class="sets-step-btn" data-dir="1">▲</button>' +
+        '</div>' +
         '<button class="sheet-del-btn">×</button>';
 
       const nameInput = item.querySelector('.editor-ex-name');
       nameInput.oninput = () => { editRoutine.exercises[i].name = nameInput.value; };
-      const setsInput = item.querySelector('.editor-ex-sets');
-      setsInput.oninput = () => { editRoutine.exercises[i].sets = parseInt(setsInput.value) || 1; };
+      item.querySelectorAll('.sets-step-btn').forEach(btn => {
+        btn.onclick = () => {
+          const dir = parseInt(btn.dataset.dir);
+          editRoutine.exercises[i].sets = Math.max(1, Math.min(10, editRoutine.exercises[i].sets + dir));
+          item.querySelector('.sets-step-val').textContent = editRoutine.exercises[i].sets;
+        };
+      });
       item.querySelector('.sheet-del-btn').onclick = () => { editRoutine.exercises.splice(i, 1); renderEditorExList(); };
 
       // ── 데스크탑 드래그 ──

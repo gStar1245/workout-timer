@@ -247,8 +247,10 @@ body {
 .editor-ex-num { font-size: 12px; color: var(--muted); width: 18px; flex-shrink: 0; }
 .editor-ex-name { flex: 1; background: transparent; border: none; color: var(--text); font-size: 14px; outline: none; font-family: inherit; min-width: 0; }
 .editor-ex-name::placeholder { color: var(--muted); }
-.editor-ex-sets { width: 44px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--accent); font-size: 13px; text-align: center; outline: none; font-family: inherit; }
-.editor-ex-sets-label { font-size: 12px; color: var(--muted); }
+.sets-stepper { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.sets-step-btn { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; transition: all 0.15s; }
+.sets-step-btn:active { background: var(--surface2); color: var(--text); }
+.sets-step-val { font-size: 14px; font-weight: 600; color: var(--accent); min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; }
 
 .drag-handle { font-size: 16px; color: var(--muted); cursor: grab; flex-shrink: 0; padding: 0 2px; touch-action: none; user-select: none; }
 .drag-handle:active { cursor: grabbing; }
