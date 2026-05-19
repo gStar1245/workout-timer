@@ -182,8 +182,7 @@ body {
 .tpl-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .tpl-use-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-size: 13px; cursor: pointer; font-family: inherit; flex-shrink: 0; }
 
-.planner-box { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 14px; }
-.planner-textarea { width: 100%; min-height: 80px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 12px; font-family: monospace; padding: 10px; resize: none; outline: none; margin-bottom: 10px; }
+.planner-textarea { width: 100%; min-height: 80px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 12px; font-family: monospace; padding: 10px; resize: none; outline: none; margin-bottom: 8px; }
 .planner-textarea:focus { border-color: var(--accent); }
 .planner-textarea::placeholder { color: var(--muted); }
 .planner-load-btn {
