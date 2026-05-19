@@ -244,8 +244,10 @@ body {
   color: var(--text); font-size: 16px; font-weight: 600; outline: none; font-family: inherit;
 }
 .editor-name-input:focus { border-color: var(--accent); }
+:root.light .editor-name-input { background: var(--bg); }
 
 .editor-ex-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); margin-bottom: 6px; }
+:root.light .editor-ex-item { background: var(--bg); }
 .editor-ex-num { font-size: 12px; color: var(--muted); width: 18px; flex-shrink: 0; }
 .editor-ex-name { flex: 1; background: transparent; border: none; color: var(--text); font-size: 14px; outline: none; font-family: inherit; min-width: 0; }
 .editor-ex-name::placeholder { color: var(--muted); }
