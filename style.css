@@ -208,8 +208,8 @@ body {
 
 #chartContainer { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); padding: 8px; margin-bottom: 1rem; min-height: 170px; }
 
-.history-clear-btn { padding: 4px 10px; border-radius: 7px; border: 1px solid rgba(255,92,92,0.35); background: transparent; color: var(--danger); font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
-.history-clear-btn:active { background: rgba(255,92,92,0.08); }
+.history-del-btn { width: 22px; height: 22px; border-radius: 6px; border: none; background: transparent; color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; font-family: inherit; margin-left: 4px; transition: color 0.15s; }
+.history-del-btn:active { color: var(--danger); }
 
 .history-date-header { font-size: 13px; font-weight: 600; color: var(--muted); margin: 12px 0 6px; }
 .history-item {

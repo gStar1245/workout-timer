@@ -81,6 +81,9 @@ const History = {
     if (list.length > 365) list.length = 365; // 최대 1년치
     lsSet(this._key, list);
   },
+  delete(id) {
+    lsSet(this._key, this.getAll().filter(r => r.id !== id));
+  },
   getStreak() {
     const list = this.getAll();
     if (!list.length) return 0;

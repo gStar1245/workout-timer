@@ -135,6 +135,7 @@ const HistoryUI = (() => {
           '<div class="history-item-top">' +
             '<span class="history-routine-name">' + r.routineName + '</span>' +
             '<span class="history-duration">' + r.durationMin + '분</span>' +
+            '<button class="history-del-btn" title="기록 삭제">×</button>' +
           '</div>' +
           '<div class="history-item-meta">' +
             '<span>' + r.completedSets + '/' + r.totalSets + '세트</span>' +
@@ -142,6 +143,12 @@ const HistoryUI = (() => {
             '<span class="history-pct" style="color:' + (completionPct >= 100 ? 'var(--success)' : 'var(--muted)') + '">' + completionPct + '%</span>' +
           '</div>' +
           '<div class="history-progress-bar"><div style="width:' + completionPct + '%;background:' + (completionPct >= 100 ? 'var(--success)' : 'var(--accent)') + '"></div></div>';
+        item.querySelector('.history-del-btn').addEventListener('click', e => {
+          e.stopPropagation();
+          History.delete(r.id);
+          renderHistoryList();
+          renderSummaryCards();
+        });
         item.onclick = () => showRecordDetail(r);
         list.appendChild(item);
       });
@@ -181,11 +188,5 @@ const HistoryUI = (() => {
     return (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
   }
 
-  function clearHistory() {
-    if (!confirm('운동 기록을 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
-    lsSet('v2_history', []);
-    render();
-  }
-
-  return { render, renderChart, closeRecordDetail, clearHistory };
+  return { render, renderChart, closeRecordDetail };
 })();
